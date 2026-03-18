@@ -263,11 +263,11 @@
           "notes": "Not published. Likely included."
         },
         "normalized": {
-          "cpu_per_vcpu_hr": 0.09,
-          "memory_per_gib_hr": 0.03,
-          "total_1vcpu_2gb_hr": 0.09,
+          "cpu_per_vcpu_hr": 0.06,
+          "memory_per_gib_hr": 0.02,
+          "total_1vcpu_2gb_hr": 0.06,
           "confidence": "exact",
-          "notes": "PAYG overage rate: $0.0015/unit-min x 60 min. CPU+memory bundled so total = CPU rate."
+          "notes": "Prepaid rate: $0.001/unit-min x 60 min. CPU+memory bundled so total = CPU rate."
         }
       },
       "plans": [

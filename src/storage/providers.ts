@@ -33,11 +33,11 @@ export const storageProviders: StorageProviderConfig[] = [
   },
   {
     name: 'tigris',
-    requiredEnvVars: ['TIGRIS_ACCESS_KEY_ID', 'TIGRIS_SECRET_ACCESS_KEY', 'TIGRIS_BUCKET'],
-    bucket: process.env.TIGRIS_BUCKET!,
+    requiredEnvVars: ['TIGRIS_STORAGE_ACCESS_KEY_ID', 'TIGRIS_STORAGE_SECRET_ACCESS_KEY', 'TIGRIS_STORAGE_BUCKET'],
+    bucket: process.env.TIGRIS_STORAGE_BUCKET!,
     createStorage: () => tigris({
-      accessKeyId: process.env.TIGRIS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.TIGRIS_SECRET_ACCESS_KEY!,
+      accessKeyId: process.env.TIGRIS_STORAGE_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY!,
     }),
     fileSizes: [1024 * 1024, 10 * 1024 * 1024],
   },

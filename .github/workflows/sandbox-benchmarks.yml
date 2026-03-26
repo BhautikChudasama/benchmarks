@@ -2,6 +2,12 @@ name: Sandbox Benchmark
 
 on:
   pull_request:
+    paths:
+      - 'src/sandbox/**'
+      - 'src/util/**'
+      - 'src/run.ts'
+      - 'src/merge-results.ts'
+      - 'package.json'
   schedule:
     - cron: '0 0 * * *' # Daily at midnight UTC
   workflow_dispatch:

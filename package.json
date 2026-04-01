@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@computesdk/blaxel": "^1.6.0",
-    "@computesdk/browserbase": "^0.2.0",
+    "@computesdk/browserbase": "^0.3.0",
     "@computesdk/cloudflare": "^1.6.0",
     "@computesdk/codesandbox": "^1.5.40",
     "@computesdk/daytona": "^1.7.14",

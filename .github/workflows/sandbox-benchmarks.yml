@@ -223,4 +223,5 @@ jobs:
           git add results.svg *_tti.svg pricing.svg results/
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: update benchmark results"
+          git pull --rebase
           git push

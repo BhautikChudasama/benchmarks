@@ -29,4 +29,5 @@ jobs:
           git add pricing.svg
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: update pricing SVG [skip ci]"
+          git pull --rebase
           git push

@@ -1,6 +1,7 @@
 name: Trigger Dotcom Rebuild
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

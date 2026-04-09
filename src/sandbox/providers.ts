@@ -22,15 +22,9 @@ import type { ProviderConfig } from './types.js';
 export const providers: ProviderConfig[] = [
   // --- Direct mode (provider SDK packages) ---
   {
-    name: 'e2b',
-    requiredEnvVars: ['E2B_API_KEY'],
-    createCompute: () => e2b({ apiKey: process.env.E2B_API_KEY! }),
-  },
-  {
-    name: 'daytona',
-    requiredEnvVars: ['DAYTONA_API_KEY'],
-    createCompute: () => daytona({ apiKey: process.env.DAYTONA_API_KEY! }),
-    sandboxOptions: { autoStopInterval: 15, autoDeleteInterval: 0 },
+    name: 'beam',
+    requiredEnvVars: ['BEAM_TOKEN', 'BEAM_WORKSPACE_ID'],
+    createCompute: () => beam({ token: process.env.BEAM_TOKEN!, workspaceId: process.env.BEAM_WORKSPACE_ID! }),
   },
   {
     name: 'blaxel',
@@ -38,29 +32,9 @@ export const providers: ProviderConfig[] = [
     createCompute: () => blaxel({ apiKey: process.env.BL_API_KEY!, workspace: process.env.BL_WORKSPACE!, region: 'us-was-1' }),
   },
   {
-    name: 'beam',
-    requiredEnvVars: ['BEAM_TOKEN', 'BEAM_WORKSPACE_ID'],
-    createCompute: () => beam({ token: process.env.BEAM_TOKEN!, workspaceId: process.env.BEAM_WORKSPACE_ID! }),
-  },
-  // {
-  //   name: 'just-bash',
-  //   requiredEnvVars: [],
-  //   createCompute: () => justBash({ files: {} }),
-  // },
-  {
-    name: 'modal',
-    requiredEnvVars: ['MODAL_TOKEN_ID', 'MODAL_TOKEN_SECRET'],
-    createCompute: () => modal({ tokenId: process.env.MODAL_TOKEN_ID!, tokenSecret: process.env.MODAL_TOKEN_SECRET! }),
-  },
-  {
-    name: 'vercel',
-    requiredEnvVars: ['VERCEL_TOKEN', 'VERCEL_TEAM_ID', 'VERCEL_PROJECT_ID'],
-    createCompute: () => vercel({ token: process.env.VERCEL_TOKEN!, teamId: process.env.VERCEL_TEAM_ID!, projectId: process.env.VERCEL_PROJECT_ID! }),
-  },
-  {
-    name: 'hopx',
-    requiredEnvVars: ['HOPX_API_KEY'],
-    createCompute: () => hopx({ apiKey: process.env.HOPX_API_KEY! }),
+    name: 'cloudflare',
+    requiredEnvVars: ['CLOUDFLARE_SANDBOX_URL', 'CLOUDFLARE_SANDBOX_SECRET'],
+    createCompute: () => cloudflare({ sandboxUrl: process.env.CLOUDFLARE_SANDBOX_URL!, sandboxSecret: process.env.CLOUDFLARE_SANDBOX_SECRET! }),
   },
   {
     name: 'codesandbox',
@@ -69,9 +43,25 @@ export const providers: ProviderConfig[] = [
     destroyTimeoutMs: 1_000,
   },
   {
-    name: 'runloop',
-    requiredEnvVars: ['RUNLOOP_API_KEY'],
-    createCompute: () => runloop({ apiKey: process.env.RUNLOOP_API_KEY! }),
+    name: 'daytona',
+    requiredEnvVars: ['DAYTONA_API_KEY'],
+    createCompute: () => daytona({ apiKey: process.env.DAYTONA_API_KEY! }),
+    sandboxOptions: { autoStopInterval: 15, autoDeleteInterval: 0 },
+  },
+  {
+    name: 'e2b',
+    requiredEnvVars: ['E2B_API_KEY'],
+    createCompute: () => e2b({ apiKey: process.env.E2B_API_KEY! }),
+  },
+  {
+    name: 'hopx',
+    requiredEnvVars: ['HOPX_API_KEY'],
+    createCompute: () => hopx({ apiKey: process.env.HOPX_API_KEY! }),
+  },
+  {
+    name: 'modal',
+    requiredEnvVars: ['MODAL_TOKEN_ID', 'MODAL_TOKEN_SECRET'],
+    createCompute: () => modal({ tokenId: process.env.MODAL_TOKEN_ID!, tokenSecret: process.env.MODAL_TOKEN_SECRET! }),
   },
   {
     name: 'namespace',
@@ -80,14 +70,19 @@ export const providers: ProviderConfig[] = [
     sandboxOptions: { image: 'node:22' },
   },
   {
-    name: 'cloudflare',
-    requiredEnvVars: ['CLOUDFLARE_SANDBOX_URL', 'CLOUDFLARE_SANDBOX_SECRET'],
-    createCompute: () => cloudflare({ sandboxUrl: process.env.CLOUDFLARE_SANDBOX_URL!, sandboxSecret: process.env.CLOUDFLARE_SANDBOX_SECRET! }),
+    name: 'runloop',
+    requiredEnvVars: ['RUNLOOP_API_KEY'],
+    createCompute: () => runloop({ apiKey: process.env.RUNLOOP_API_KEY! }),
   },
   {
     name: 'sprites',
     requiredEnvVars: ['SPRITES_TOKEN'],
     createCompute: () => sprites({ apiKey: process.env.SPRITES_TOKEN! }),
+  },
+  {
+    name: 'vercel',
+    requiredEnvVars: ['VERCEL_TOKEN', 'VERCEL_TEAM_ID', 'VERCEL_PROJECT_ID'],
+    createCompute: () => vercel({ token: process.env.VERCEL_TOKEN!, teamId: process.env.VERCEL_TEAM_ID!, projectId: process.env.VERCEL_PROJECT_ID! }),
   },
   //
   // --- Automatic mode (via ComputeSDK gateway) ---

@@ -38,7 +38,8 @@ permissions:
 jobs:
   bench:
     name: Bench ${{ matrix.provider }}
-    runs-on: namespace-profile-default
+    runs-on:
+      - ubuntu-24.04-arm
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -88,7 +89,8 @@ jobs:
 
   collect:
     name: Collect Results
-    runs-on: namespace-profile-default
+    runs-on:
+      - ubuntu-24.04-arm
     needs: bench
     if: always()
     steps:

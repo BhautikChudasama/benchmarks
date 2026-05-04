@@ -28,7 +28,7 @@ export const providers: ProviderConfig[] = [
     name: 'fcspawn',
     requiredEnvVars: ['FCSPAWN_URL', 'FCSPAWN_TOKEN'],
     createCompute: () => fcspawn({ baseUrl: process.env.FCSPAWN_URL!, apiKey: process.env.FCSPAWN_TOKEN! }),
-    sandboxOptions: { shape: 's-1vcpu-256mb', rootfs: 'python-sshd' },
+    sandboxOptions: { shape: 's-1vcpu-256mb', rootfs: 'devbox:1' },
   },
   // --- Direct mode (provider SDK packages) ---
   {

@@ -68,6 +68,10 @@ jobs:
           ref: 67d990c4f860cb5c90f0e8628d283a5e38274023
           path: upstream
           persist-credentials: false
+      - name: Register the CreateOS OCI boot image
+        if: matrix.suite == 'oci-tti'
+        working-directory: upstream
+        run: git apply ../benchmarks/scripts/createos-oci-tti.patch
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: upstream/package.json

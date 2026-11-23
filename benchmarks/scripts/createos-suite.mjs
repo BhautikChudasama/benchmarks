@@ -48,6 +48,12 @@ if (mode === 'matrix') {
   } finally {
     await suite.beforeExit?.();
   }
+  // As in the upstream CLI, provider timers may outlive a completed run.
+  // Drain piped CI output before exiting; score-file writes above are synchronous.
+  await Promise.all([process.stdout, process.stderr].map(stream =>
+    new Promise((resolve, reject) => stream.write('', err => err ? reject(err) : resolve())),
+  ));
+  process.exit(process.exitCode ?? 0);
 } else {
   throw new Error('Expected matrix <suite|all> or run <suite>');
 }

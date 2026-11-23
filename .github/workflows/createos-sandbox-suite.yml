@@ -6,7 +6,7 @@ on:
         description: Sandbox benchmark (all includes a 355-minute soak shift)
         type: choice
         required: true
-        default: all
+        default: tti
         options:
           - all
           - tti

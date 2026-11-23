@@ -5,11 +5,11 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const suites = [
-  'tti', 'dax', 'oci-tti', 'sandbox-burst-survival', 'sandbox-soak',
+  'tti', 'dax', 'oci-tti', 'sandbox-burst-survival',
   'cpu', 'sandbox-cpu-burst', 'sandbox-fs-api', 'sandbox-fs-io',
   'filesystem-snapshot', 'sandbox-snapshot', 'sandbox-snapshot-fanout',
   'sandbox-pause-resume', 'rootfs', 'volumes', 'os-capabilities',
-  'sandbox-ci-capabilities', 'sandbox-fidelity',
+  'sandbox-ci-capabilities', 'sandbox-fidelity', 'sandbox-soak',
 ];
 
 const [mode, selection] = process.argv.slice(2);

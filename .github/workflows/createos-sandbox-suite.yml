@@ -52,7 +52,7 @@ jobs:
     timeout-minutes: ${{ matrix.suite == 'sandbox-soak' && 420 || 120 }}
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 1
       matrix:
         suite: ${{ fromJSON(needs.select.outputs.suites) }}
     concurrency:

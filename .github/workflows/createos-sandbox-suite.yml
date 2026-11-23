@@ -1,0 +1,136 @@
+name: CreateOS sandbox benchmarks
+on:
+  workflow_dispatch:
+    inputs:
+      benchmark:
+        description: Sandbox benchmark (all includes a 355-minute soak shift)
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - tti
+          - dax
+          - oci-tti
+          - sandbox-burst-survival
+          - sandbox-soak
+          - cpu
+          - sandbox-cpu-burst
+          - sandbox-fs-api
+          - sandbox-fs-io
+          - filesystem-snapshot
+          - sandbox-snapshot
+          - sandbox-snapshot-fanout
+          - sandbox-pause-resume
+          - rootfs
+          - volumes
+          - os-capabilities
+          - sandbox-ci-capabilities
+          - sandbox-fidelity
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      suites: ${{ steps.select.outputs.suites }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: select
+        env:
+          SUITE: ${{ inputs.benchmark }}
+        run: |
+          suites=$(node benchmarks/scripts/createos-suite.mjs matrix "$SUITE")
+          echo "suites=$suites" >> "$GITHUB_OUTPUT"
+
+  benchmark:
+    needs: select
+    name: CreateOS / ${{ matrix.suite }}
+    runs-on: namespace-profile-default
+    timeout-minutes: ${{ matrix.suite == 'sandbox-soak' && 420 || 120 }}
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        suite: ${{ fromJSON(needs.select.outputs.suites) }}
+    concurrency:
+      group: createos-suite-${{ github.ref }}-${{ matrix.suite }}
+      cancel-in-progress: false
+    env:
+      SUITE: ${{ matrix.suite }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: computesdk/benchmarks
+          ref: 67d990c4f860cb5c90f0e8628d283a5e38274023
+          path: upstream
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: upstream/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: upstream/pnpm-lock.yaml
+      - name: Build pinned benchmark runner
+        working-directory: upstream
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          pnpm -r --filter './packages/**' run build
+          cp ../benchmarks/scripts/createos-suite.mjs .
+      - uses: actions/cache/restore@v4
+        if: matrix.suite == 'sandbox-soak'
+        with:
+          path: upstream/results/sandbox_soak/state/createos.json
+          key: createos-soak-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: createos-soak-${{ github.ref }}-
+      - name: Run and score CreateOS
+        working-directory: upstream
+        env:
+          CREATEOS_SANDBOX_API_KEY: ${{ secrets.CREATEOS_SANDBOX_API_KEY }}
+          SCORE_FILE: ${{ runner.temp }}/${{ matrix.suite }}.md
+        run: pnpm exec tsx createos-suite.mjs run "$SUITE"
+      - uses: actions/cache/save@v4
+        if: always() && matrix.suite == 'sandbox-soak' && hashFiles('upstream/results/sandbox_soak/state/createos.json') != ''
+        with:
+          path: upstream/results/sandbox_soak/state/createos.json
+          key: createos-soak-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: score-${{ matrix.suite }}
+          path: ${{ runner.temp }}/${{ matrix.suite }}.md
+          if-no-files-found: error
+          overwrite: true
+
+  scores:
+    if: always() && needs.select.result == 'success'
+    needs: [select, benchmark]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: score-*
+          merge-multiple: true
+          path: scores
+      - name: Print final scores
+        env:
+          SUITES: ${{ needs.select.outputs.suites }}
+        run: |
+          {
+            echo '### CreateOS sandbox scores'
+            echo
+            echo '| Benchmark | Dimensions | Score | Success rate |'
+            echo '| --- | --- | ---: | ---: |'
+            for suite in $(jq -r '.[]' <<< "$SUITES"); do
+              if [[ -s "scores/$suite.md" ]]; then
+                cat "scores/$suite.md"
+              else
+                echo "| $suite | — | No result (see job log) | — |"
+              fi
+            done
+          } | tee -a "$GITHUB_STEP_SUMMARY"

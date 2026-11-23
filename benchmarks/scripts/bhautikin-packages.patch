@@ -1,0 +1,88 @@
+--- a/package.json
++++ b/package.json
+@@ -205,7 +205,7 @@
+     "@computesdk/cloudflare": "^2.1.19",
+     "@computesdk/codesandbox": "^1.5.76",
+     "@computesdk/collimate": "^0.1.25",
+-    "@computesdk/createos-sandbox": "^0.1.33",
++    "@computesdk/createos-sandbox": "npm:@bhautikin/ccos@0.1.12",
+     "@computesdk/daytona": "^1.7.58",
+     "@computesdk/e2b": "^1.7.77",
+     "@computesdk/ec2-firecrab": "^1.0.11",
+@@ -249,7 +249,7 @@
+     "@daytonaio/sdk": "^0.232.0",
+     "@electric-sql/pglite": "^0.5.17",
+     "@google-cloud/storage": "^9.0.0",
+-    "@nodeops-createos/sandbox": "^0.8.3",
++    "@nodeops-createos/sandbox": "npm:@bhautikin/createos-sandbox@0.8.3",
+     "@northflank/js-client": "^0.13.0",
+     "@storagesdk/adapters": "^0.12.1",
+     "@storagesdk/core": "^0.5.0",
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -88,8 +88,8 @@
+         specifier: ^0.1.25
+         version: 0.1.25
+       '@computesdk/createos-sandbox':
+-        specifier: ^0.1.33
+-        version: 0.1.33
++        specifier: npm:@bhautikin/ccos@0.1.12
++        version: '@bhautikin/ccos@0.1.12'
+       '@computesdk/daytona':
+         specifier: ^1.7.58
+         version: 1.7.58(bufferutil@4.2.0)(utf-8-validate@6.0.6)
+@@ -220,8 +220,8 @@
+         specifier: ^9.0.0
+         version: 9.0.0
+       '@nodeops-createos/sandbox':
+-        specifier: ^0.8.3
+-        version: 0.8.3
++        specifier: npm:@bhautikin/createos-sandbox@0.8.3
++        version: '@bhautikin/createos-sandbox@0.8.3'
+       '@northflank/js-client':
+         specifier: ^0.13.0
+         version: 0.13.0
+@@ -859,8 +859,8 @@
+   '@computesdk/collimate@0.1.25':
+     resolution: {integrity: sha512-GUJyJ75U70/UsXfGqPnr2hPUShB25/ZRpM2ZAcB+YRfR0LWGF1moOTpSvYB5wfORaMyMbyHVKeQKkZDmC8UCUw==}
+ 
+-  '@computesdk/createos-sandbox@0.1.33':
+-    resolution: {integrity: sha512-NXI07oYp0C+Gbr4bDnKH2yO6O19T4DkoQkhKPDY5hi7C3KJgQ14XoQX5jJ6lhValIgCc28jzYSDXZsxO/KAqog==}
++  '@bhautikin/ccos@0.1.12':
++    resolution: {integrity: sha512-m1wdEjpKzYse4B6nFzBCu9KAKlXACkaVrzueLihA8LfqIHe/8EnPdfI0cCFh+erKDHg2oghkDOdjYWF1AIxAlQ==}
+     engines: {node: '>=22'}
+ 
+   '@computesdk/daytona@1.7.58':
+@@ -1797,8 +1797,8 @@
+     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
+     engines: {node: '>= 8'}
+ 
+-  '@nodeops-createos/sandbox@0.8.3':
+-    resolution: {integrity: sha512-6d4W3IzRYq4rvXOQnF0gwdo+wlwryEdKdnE8jf6X5XQSF/y6meAHCSYMkDtNItqoTVahkDzfWVNwaLuM3gOmsQ==}
++  '@bhautikin/createos-sandbox@0.8.3':
++    resolution: {integrity: sha512-DVVW0w8b6jNAjPax6fAQM3Q6Z3Cmzs/01YoFRW1/2n0yTtS9uJLwPON7DzV/gkr9zVIRhFaLEVMjuyhAk+QQ/A==}
+     engines: {node: '>=20'}
+ 
+   '@northflank/js-client@0.13.0':
+@@ -6997,10 +6997,10 @@
+       '@computesdk/provider': 2.1.28
+       computesdk: 4.1.22
+ 
+-  '@computesdk/createos-sandbox@0.1.33':
++  '@bhautikin/ccos@0.1.12':
+     dependencies:
+       '@computesdk/provider': 2.1.28
+-      '@nodeops-createos/sandbox': 0.8.3
++      '@bhautikin/createos-sandbox': 0.8.3
+ 
+   '@computesdk/daytona@1.7.58(bufferutil@4.2.0)(utf-8-validate@6.0.6)':
+     dependencies:
+@@ -8015,7 +8015,7 @@
+       '@nodelib/fs.scandir': 2.1.5
+       fastq: 1.20.3
+ 
+-  '@nodeops-createos/sandbox@0.8.3':
++  '@bhautikin/createos-sandbox@0.8.3':
+     optionalDependencies:
+       '@types/node': 26.1.1
+       undici: 7.30.2

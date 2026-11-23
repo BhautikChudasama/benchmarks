@@ -41,7 +41,7 @@ if (mode === 'matrix') {
       const dimensions = JSON.stringify(row.dimensions);
       const score = row.skipped ? 'Skipped' : row.compositeScore.toFixed(2);
       const success = row.skipped ? '—' : (100 * row.successRate).toFixed(1) + '%';
-      const line = '| ' + [selection, dimensions, score, success].join(' | ') + ' |';
+      const line = '| ' + [selection, process.env.ADAPTER_RELEASE, process.env.SDK_RELEASE, dimensions, score, success].join(' | ') + ' |';
       console.log(line);
       appendFileSync(process.env.SCORE_FILE, line + '\n');
     }

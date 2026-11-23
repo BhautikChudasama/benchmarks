@@ -2,6 +2,14 @@ name: CreateOS sandbox benchmarks
 on:
   workflow_dispatch:
     inputs:
+      packages:
+        description: CreateOS package track
+        type: choice
+        default: official
+        required: true
+        options:
+          - official
+          - bhautikin
       benchmark:
         description: Sandbox benchmark (all includes a 355-minute soak shift)
         type: choice
@@ -72,6 +80,10 @@ jobs:
         if: matrix.suite == 'oci-tti'
         working-directory: upstream
         run: git apply ../benchmarks/scripts/createos-oci-tti.patch
+      - name: Apply test package aliases and lockfile
+        if: inputs.packages == 'bhautikin'
+        working-directory: upstream
+        run: git apply ../benchmarks/scripts/bhautikin-packages.patch
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: upstream/package.json
@@ -84,25 +96,30 @@ jobs:
         working-directory: upstream
         run: |
           pnpm install --frozen-lockfile --ignore-scripts
+          node ../benchmarks/scripts/verify-createos-packages.mjs "${{ inputs.packages }}"
           pnpm -r --filter './packages/**' run build
           cp ../benchmarks/scripts/createos-suite.mjs .
       - uses: actions/cache/restore@v4
         if: matrix.suite == 'sandbox-soak'
         with:
           path: upstream/results/sandbox_soak/state/createos.json
-          key: createos-soak-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: createos-soak-${{ github.ref }}-
+          key: createos-soak-${{ inputs.packages }}-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: createos-soak-${{ inputs.packages }}-${{ github.ref }}-
       - name: Run and score CreateOS
         working-directory: upstream
         env:
           CREATEOS_SANDBOX_API_KEY: ${{ secrets.CREATEOS_SANDBOX_API_KEY }}
+          CREATEOS_S3_BUCKET: ${{ matrix.suite == 'volumes' && secrets.CREATEOS_S3_BUCKET || '' }}
+          CREATEOS_S3_ENDPOINT: ${{ matrix.suite == 'volumes' && secrets.CREATEOS_S3_ENDPOINT || '' }}
+          CREATEOS_S3_ACCESS_KEY: ${{ matrix.suite == 'volumes' && secrets.CREATEOS_S3_ACCESS_KEY || '' }}
+          CREATEOS_S3_SECRET_KEY: ${{ matrix.suite == 'volumes' && secrets.CREATEOS_S3_SECRET_KEY || '' }}
           SCORE_FILE: ${{ runner.temp }}/${{ matrix.suite }}.md
         run: pnpm exec tsx createos-suite.mjs run "$SUITE"
       - uses: actions/cache/save@v4
         if: always() && matrix.suite == 'sandbox-soak' && hashFiles('upstream/results/sandbox_soak/state/createos.json') != ''
         with:
           path: upstream/results/sandbox_soak/state/createos.json
-          key: createos-soak-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: createos-soak-${{ inputs.packages }}-${{ github.ref }}-${{ github.run_id }}-${{ github.run_attempt }}
       - uses: actions/upload-artifact@v4
         if: success()
         with:
@@ -128,13 +145,13 @@ jobs:
           {
             echo '### CreateOS sandbox scores'
             echo
-            echo '| Benchmark | Dimensions | Score | Success rate |'
-            echo '| --- | --- | ---: | ---: |'
+            echo '| Benchmark | Adapter | SDK | Dimensions | Score | Success rate |'
+            echo '| --- | --- | --- | --- | ---: | ---: |'
             for suite in $(jq -r '.[]' <<< "$SUITES"); do
               if [[ -s "scores/$suite.md" ]]; then
                 cat "scores/$suite.md"
               else
-                echo "| $suite | — | No result (see job log) | — |"
+                echo "| $suite | — | — | — | No result (see job log) | — |"
               fi
             done
           } | tee -a "$GITHUB_STEP_SUMMARY"

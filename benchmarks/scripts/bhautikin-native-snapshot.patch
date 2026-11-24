@@ -1,0 +1,126 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -258,8 +258,7 @@
+         const client = resolveClient(config);
+         const opts = options ?? {};
+         if (opts.snapshotId) {
+-          const source = await client.getSandbox(opts.snapshotId);
+-          const forked = await source.fork(toForkRequest(opts));
++          const forked = await client.createSandbox({ ...toForkRequest(opts), snapshot_id: opts.snapshotId });
+           await forked.waitUntilRunning();
+           sandboxConfig.set(forked, config);
+           if (provider.isUnifiedVolumeMounts(opts.volumes)) {
+@@ -461,31 +460,15 @@
+       create: async (config, sandboxId, options) => {
+         const client = resolveClient(config);
+         const source = await client.getSandbox(sandboxId);
+-        const wasPaused = source.status === "paused";
+-        if (!wasPaused) {
+-          await source.pause();
+-          await source.waitUntilPaused();
+-        }
+-        let snapshot;
+-        try {
+-          snapshot = await source.fork({ start_paused: true });
+-          await snapshot.waitUntilPaused();
+-        } catch (err) {
+-          if (snapshot) await snapshot.destroy().catch(() => {
+-          });
+-          if (!wasPaused) await source.resume().catch(() => {
+-          });
+-          throw err;
+-        }
+-        if (!wasPaused) {
+-          try {
+-            await source.resume();
+-            await source.waitUntilRunning();
+-          } catch (err) {
+-            await snapshot.destroy().catch(() => {
+-            });
+-            throw err;
+-          }
++        let snapshot = await source.createSnapshot({ type: "full", name: options?.name });
++        const deadline = Date.now() + 120000;
++        while (snapshot.status === "creating" && Date.now() < deadline) {
++          await new Promise(resolve => setTimeout(resolve, 250));
++          snapshot = await client.snapshots.get(snapshot.id);
++        }
++        if (snapshot.status !== "ready") {
++          if (snapshot.status === "failed") await client.snapshots.delete(snapshot.id);
++          throw new Error("Snapshot " + snapshot.id + " did not become ready: " + snapshot.status);
+         }
+         return {
+           id: snapshot.id,
+@@ -506,8 +489,7 @@
+       delete: async (config, snapshotId) => {
+         const client = resolveClient(config);
+         try {
+-          const sandbox = await client.getSandbox(snapshotId);
+-          await sandbox.destroy();
++          await client.snapshots.delete(snapshotId);
+         } catch (e) {
+           if (isNotFound(e)) return;
+           throw e;
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -256,8 +256,7 @@
+         const client = resolveClient(config);
+         const opts = options ?? {};
+         if (opts.snapshotId) {
+-          const source = await client.getSandbox(opts.snapshotId);
+-          const forked = await source.fork(toForkRequest(opts));
++          const forked = await client.createSandbox({ ...toForkRequest(opts), snapshot_id: opts.snapshotId });
+           await forked.waitUntilRunning();
+           sandboxConfig.set(forked, config);
+           if (isUnifiedVolumeMounts(opts.volumes)) {
+@@ -459,31 +458,15 @@
+       create: async (config, sandboxId, options) => {
+         const client = resolveClient(config);
+         const source = await client.getSandbox(sandboxId);
+-        const wasPaused = source.status === "paused";
+-        if (!wasPaused) {
+-          await source.pause();
+-          await source.waitUntilPaused();
+-        }
+-        let snapshot;
+-        try {
+-          snapshot = await source.fork({ start_paused: true });
+-          await snapshot.waitUntilPaused();
+-        } catch (err) {
+-          if (snapshot) await snapshot.destroy().catch(() => {
+-          });
+-          if (!wasPaused) await source.resume().catch(() => {
+-          });
+-          throw err;
+-        }
+-        if (!wasPaused) {
+-          try {
+-            await source.resume();
+-            await source.waitUntilRunning();
+-          } catch (err) {
+-            await snapshot.destroy().catch(() => {
+-            });
+-            throw err;
+-          }
++        let snapshot = await source.createSnapshot({ type: "full", name: options?.name });
++        const deadline = Date.now() + 120000;
++        while (snapshot.status === "creating" && Date.now() < deadline) {
++          await new Promise(resolve => setTimeout(resolve, 250));
++          snapshot = await client.snapshots.get(snapshot.id);
++        }
++        if (snapshot.status !== "ready") {
++          if (snapshot.status === "failed") await client.snapshots.delete(snapshot.id);
++          throw new Error("Snapshot " + snapshot.id + " did not become ready: " + snapshot.status);
+         }
+         return {
+           id: snapshot.id,
+@@ -504,8 +487,7 @@
+       delete: async (config, snapshotId) => {
+         const client = resolveClient(config);
+         try {
+-          const sandbox = await client.getSandbox(snapshotId);
+-          await sandbox.destroy();
++          await client.snapshots.delete(snapshotId);
+         } catch (e) {
+           if (isNotFound(e)) return;
+           throw e;

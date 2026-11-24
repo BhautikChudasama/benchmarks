@@ -99,6 +99,13 @@ jobs:
           node ../benchmarks/scripts/verify-createos-packages.mjs "${{ inputs.packages }}"
           pnpm -r --filter './packages/**' run build
           cp ../benchmarks/scripts/createos-suite.mjs .
+      - name: Use native full snapshots for CreateOS snapshot benchmarks
+        if: inputs.packages == 'bhautikin' && (matrix.suite == 'sandbox-snapshot' || matrix.suite == 'sandbox-snapshot-fanout')
+        working-directory: upstream
+        run: |
+          adapter_dir=$(dirname "$(node -p "require.resolve('@computesdk/createos-sandbox')")")/..
+          patch --batch --fuzz=0 -d "$adapter_dir" -p1 < ../benchmarks/scripts/bhautikin-native-snapshot.patch
+          echo 'ADAPTER_RELEASE=@bhautikin/ccos@0.1.13 (native snapshot patch)' >> "$GITHUB_ENV"
       - uses: actions/cache/restore@v4
         if: matrix.suite == 'sandbox-soak'
         with:

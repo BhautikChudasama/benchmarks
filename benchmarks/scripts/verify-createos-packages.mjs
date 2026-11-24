@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path';
 
 const tracks = {
   official: ['@computesdk/createos-sandbox', '0.1.33', '@nodeops-createos/sandbox', '0.8.3'],
-  bhautikin: ['@bhautikin/ccos', '0.1.12', '@bhautikin/createos-sandbox', '0.8.3'],
+  bhautikin: ['@bhautikin/ccos', '0.1.13', '@bhautikin/createos-sandbox', '0.8.4'],
 };
 const [providerName, providerVersion, sdkName, sdkVersion] = tracks[process.argv[2]];
 
